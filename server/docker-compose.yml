@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  admin:
+    build:
+      context: ./apps/admin
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/memberly
+    depends_on:
+      - db
+    command: ['yarn', 'start:prod']
+
+  analytics:
+    build:
+      context: ./apps/analytics
+      dockerfile: Dockerfile
+    ports:
+      - '3002:3002'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/memberly
+    depends_on:
+      - db
+    command: ['yarn', 'start:prod']
+
+  membership:
+    build:
+      context: ./apps/membership
+      dockerfile: Dockerfile
+    ports:
+      - '3003:3003'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/memberly
+    depends_on:
+      - db
+    command: ['yarn', 'start:prod']
+
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: memberly
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  postgres-data:
