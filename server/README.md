@@ -24,6 +24,10 @@
 
 ## Description
 
+nest new server
+nest g app user
+nest g library common
+
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Project setup

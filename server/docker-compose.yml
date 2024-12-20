@@ -8,9 +8,11 @@ services:
     ports:
       - '3001:3001'
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/memberly
+      - DATABASE_URL=${DATABASE_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     depends_on:
       - db
+      - rabbitmq
     command: ['yarn', 'start:prod']
 
   analytics:
@@ -20,9 +22,11 @@ services:
     ports:
       - '3002:3002'
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/memberly
+      - DATABASE_URL=${DATABASE_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     depends_on:
       - db
+      - rabbitmq
     command: ['yarn', 'start:prod']
 
   membership:
@@ -32,9 +36,11 @@ services:
     ports:
       - '3003:3003'
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/memberly
+      - DATABASE_URL=${DATABASE_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
     depends_on:
       - db
+      - rabbitmq
     command: ['yarn', 'start:prod']
 
   db:
