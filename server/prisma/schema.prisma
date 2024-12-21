@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  role      Role     @default(USER)
+}
+
+model Creator {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  name         String
+  description  String?
+  tags         String[] // Tags like "Marketing", "Fintech", etc.
+  memberships  Membership[] // Relation defined in Membership
+  createdAt    DateTime       @default(now())
+  Subscription Subscription[] // Relation defined in Subscription
+}
+
+model Membership {
+  id        Int      @id @default(autoincrement())
+  title     String
+  price     Float
+  benefits  String[]
+  creatorId Int
+  creator   Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  creatorId Int
+  creator   Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  tier      String // Subscription tier (e.g., Basic, Premium)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  CREATOR
+  ADMIN
+}
