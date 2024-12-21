@@ -11,10 +11,11 @@ import { RmqModule } from 'libs/common/src';
       isGlobal: true,
       validationSchema: joi.object({
         RABBITMQ_URL: joi.string().required(),
-        RABBITMQ_QUEUE: joi.string().required(),
+        RABBITMQ_AUTH_QUEUE: joi.string().required(),
       }),
+      envFilePath: ['.env'],
     }),
-    RmqModule.register({ name: 'MEMBERSHIP' }),
+    RmqModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

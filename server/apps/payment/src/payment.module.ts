@@ -11,10 +11,10 @@ import * as joi from 'joi';
       isGlobal: true,
       validationSchema: joi.object({
         RABBITMQ_URL: joi.string().required(),
-        RABBITMQ_QUEUE: joi.string().required(),
+        RABBITMQ_PAYMENT_QUEUE: joi.string().required(),
       }),
     }),
-    RmqModule.register({ name: 'Payment' }),
+    RmqModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

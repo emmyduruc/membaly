@@ -11,10 +11,10 @@ import { RmqModule } from 'libs/common/src';
       isGlobal: true,
       validationSchema: joi.object({
         RABBITMQ_URL: joi.string().required(),
-        RABBITMQ_QUEUE: joi.string().required(),
+        RABBITMQ_GATEWAY_QUEUE: joi.string().required(),
       }),
     }),
-    RmqModule.register({ name: 'GATEWAY' }),
+    RmqModule,
   ],
   controllers: [GatewayController],
   providers: [GatewayService],
