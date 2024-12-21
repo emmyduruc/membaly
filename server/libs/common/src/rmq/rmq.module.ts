@@ -24,7 +24,8 @@ export class RmqModule {
             useFactory: (configService: ConfigService) => ({
               transport: Transport.RMQ,
               options: {
-                urls: [configService.get<string>('RABBIT_MQ_URI')],
+                urls: ['amqp://guest:guest@rabbitmq:5672'],
+                // urls: [configService.get<string>('RABBIT_MQ_URI')],
                 queue: configService.get<string>(`RABBITMQ_${name}_QUEUE`),
               },
             }),
