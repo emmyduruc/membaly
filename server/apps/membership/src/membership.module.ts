@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { GatewayController } from './gateway.controller';
-import { GatewayService } from './gateway.service';
+import { MembershipController } from './membership.controller';
+import { MembershipService } from './membership.service';
 import { ConfigModule } from '@nestjs/config';
 import * as joi from 'joi';
 import { RmqModule } from 'libs/common/src';
@@ -14,9 +14,9 @@ import { RmqModule } from 'libs/common/src';
         RABBITMQ_QUEUE: joi.string().required(),
       }),
     }),
-    RmqModule.register({ name: 'GATEWAY' }),
+    RmqModule.register({ name: 'MEMBERSHIP' }),
   ],
-  controllers: [GatewayController],
-  providers: [GatewayService],
+  controllers: [MembershipController],
+  providers: [MembershipService],
 })
-export class GatewayModule {}
+export class MembershipModule {}

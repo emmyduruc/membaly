@@ -82,6 +82,3 @@
 
 // # Start the application
 // CMD ["node", "dist/main"]
-
-//DATABASE_URL="postgresql://neondb_owner:vwXKr7PJszn6@ep-restless-fire-a2kix2c1.eu-central-1.aws.neon.tech/neondb?sslmode=require"
-// RABBITMQ_URL='amqp://guest:guest@rabbitmq:5672'

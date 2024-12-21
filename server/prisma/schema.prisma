@@ -16,31 +16,32 @@ model User {
 }
 
 model Creator {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  name        String
-  description String?
-  tags        String[]  // Tags like "Marketing", "Fintech", etc.
-  memberships Membership[]
-  createdAt   DateTime  @default(now())
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  name         String
+  description  String?
+  tags         String[] // Tags like "Marketing", "Fintech", etc.
+  memberships  Membership[]
+  createdAt    DateTime       @default(now())
+  Subscription Subscription[]
 }
 
 model Membership {
-  id           Int       @id @default(autoincrement())
-  title        String
-  price        Float     // Membership price
-  benefits     String[]  // List of benefits
-  creatorId    Int
-  creator      Creator   @relation(fields: [creatorId], references: [id])
+  id        Int      @id @default(autoincrement())
+  title     String
+  price     Float // Membership price
+  benefits  String[] // List of benefits
+  creatorId Int
+  creator   Creator  @relation(fields: [creatorId], references: [id])
 }
 
 model Subscription {
-  id           Int       @id @default(autoincrement())
-  creatorId    Int       // Link to the creator's membership
-  creator      Creator   @relation(fields: [creatorId], references: [id])
-  tier         String    // Subscription tier (e.g., Basic, Premium)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  creatorId Int // Link to the creator's membership
+  creator   Creator  @relation(fields: [creatorId], references: [id])
+  tier      String // Subscription tier (e.g., Basic, Premium)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {

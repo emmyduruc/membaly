@@ -54,6 +54,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "membership": {
+      "type": "application",
+      "root": "apps/membership",
+      "entryFile": "main",
+      "sourceRoot": "apps/membership/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/membership/tsconfig.app.json"
+      }
     }
   }
 }

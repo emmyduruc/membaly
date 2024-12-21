@@ -16,6 +16,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "prisma:format": "npx prisma format",
+    "prima:push:dev": "dotenv -e .env.development.local -- npx prisma migrate dev",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/server/test/jest-e2e.json"
   },
@@ -26,6 +28,8 @@
     "@nestjs/microservices": "^10.4.15",
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/swagger": "^8.1.0",
+    "@prisma/client": "6.1.0",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.5",
     "cookie-parser": "^1.4.7",

@@ -20,15 +20,20 @@ export abstract class AbstractRepository<TModel, TCreateInput, TUpdateInput> {
       throw error;
     }
   }
-
-  async findOne(where: Prisma.ToolWhereUniqueInput): Promise<TModel | null> {
+  async findOne(
+    where: Prisma.CategoryWhereUniqueInput,
+  ): Promise<TModel | null> {
     const document = await this.model.findUnique({ where });
-    if (!document) {
-      this.logger.warn('Document not found with filterQuery', where);
-      throw new NotFoundException('Document not found.');
-    }
     return document;
   }
+  //   async findOne(where: Prisma.ToolWhereUniqueInput): Promise<TModel | null> {
+  //     const document = await this.model.findUnique({ where });
+  //     if (!document) {
+  //       this.logger.warn('Document not found with filterQuery', where);
+  //       throw new NotFoundException('Document not found.');
+  //     }
+  //     return document;
+  //   }
 
   async findMany(
     params: Prisma.ToolFindManyArgs<InternalArgs>,
@@ -37,7 +42,7 @@ export abstract class AbstractRepository<TModel, TCreateInput, TUpdateInput> {
   }
 
   async update(
-    where: Prisma.ToolWhereUniqueInput,
+    where: Prisma.CategoryWhereUniqueInput,
     data: TUpdateInput,
   ): Promise<TModel> {
     try {
@@ -49,7 +54,7 @@ export abstract class AbstractRepository<TModel, TCreateInput, TUpdateInput> {
     }
   }
 
-  async delete(where: Prisma.ToolWhereUniqueInput): Promise<TModel> {
+  async delete(where: Prisma.CategoryWhereUniqueInput): Promise<TModel> {
     try {
       return await this.model.delete({ where });
     } catch (error) {
@@ -59,7 +64,7 @@ export abstract class AbstractRepository<TModel, TCreateInput, TUpdateInput> {
   }
 
   async upsert(
-    where: Prisma.ToolWhereUniqueInput,
+    where: Prisma.CategoryWhereUniqueInput,
     create: TCreateInput,
     update: TUpdateInput,
   ): Promise<TModel> {
