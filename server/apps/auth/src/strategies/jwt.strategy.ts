@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Types } from 'mongoose';
 import { TokenPayload } from '../auth.service';
 // import { UsersService } from '../users/users.service';
 

@@ -8,6 +8,8 @@ export class GatewayController {
     @Inject('AUTH') private readonly authService: ClientProxy,
     @Inject('PAYMENT') private readonly paymentService: ClientProxy,
     @Inject('MEMBERSHIP') private readonly membershipService: ClientProxy,
+    @Inject('USER') private readonly userService: ClientProxy,
+    @Inject('ANALYTICS') private readonly analyticsService: ClientProxy,
   ) {}
 
   @Get('/')

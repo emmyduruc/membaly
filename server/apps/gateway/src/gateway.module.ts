@@ -19,6 +19,8 @@ import { RmqModule } from 'libs/common/src';
     RmqModule.register({ name: 'AUTH' }),
     RmqModule.register({ name: 'PAYMENT' }),
     RmqModule.register({ name: 'MEMBERSHIP' }),
+    RmqModule.register({ name: 'USER' }),
+    RmqModule.register({ name: 'ANALYTICS' }),
   ],
   controllers: [GatewayController],
   providers: [GatewayService],
