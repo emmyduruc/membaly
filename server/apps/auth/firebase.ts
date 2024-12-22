@@ -18,4 +18,27 @@ export class FirebaseAdminService {
   async verifyToken(token: string): Promise<admin.auth.DecodedIdToken> {
     return admin.auth().verifyIdToken(token);
   }
+
+  async createUser({ email, password }): Promise<admin.auth.UserRecord> {
+    return admin.auth().createUser({
+      email,
+      password,
+    });
+  }
+
+  async createCustomToken(uid: string): Promise<string> {
+    return admin.auth().createCustomToken(uid);
+  }
+
+  async getUserByEmail(email: string): Promise<admin.auth.UserRecord> {
+    return admin.auth().getUserByEmail(email);
+  }
+
+  async deleteUser(uid: string) {
+    return admin.auth().deleteUser(uid);
+  }
+
+  async updateUser(uid: string, data: any) {
+    return admin.auth().updateUser(uid, data);
+  }
 }

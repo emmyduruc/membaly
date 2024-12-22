@@ -11,6 +11,9 @@ import { MembershipController } from 'apps/membership/src/membership.controller'
 import { PaymentModule } from 'apps/payment/src/payment.module';
 import { PaymentService } from 'apps/payment/src/payment.service';
 import { FirebaseAdminService } from 'apps/auth/firebase';
+import { UserService } from 'apps/user/src/user.service';
+import { AuthService } from 'apps/auth/src/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -38,6 +41,13 @@ import { FirebaseAdminService } from 'apps/auth/firebase';
     MembershipController,
     GatewayController,
   ],
-  providers: [GatewayService, PaymentService, FirebaseAdminService],
+  providers: [
+    GatewayService,
+    PaymentService,
+    FirebaseAdminService,
+    UserService,
+    AuthService,
+    JwtService,
+  ],
 })
 export class GatewayModule {}

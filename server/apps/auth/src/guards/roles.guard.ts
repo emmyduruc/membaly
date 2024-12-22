@@ -1,19 +1,60 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { ROLES_KEY } from '@app/common/decorator/roles.decorator';
+import { UserService } from 'apps/user/src/user.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly userService: UserService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    if (!roles) {
-      return true;
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!requiredRoles) {
+      return true; // Note: roles specified means public access
     }
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const authHeader = request.headers.authorization;
 
-    return roles.includes(user.role);
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException(
+        'Authorization token is missing or invalid',
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+      const userId = this.decodeToken(token);
+
+      const user = await this.userService.findUserByFirebaseId(userId);
+
+      if (!user || !user.role) {
+        throw new UnauthorizedException('User role not found');
+      }
+
+      return requiredRoles.includes(user.role);
+    } catch (err) {
+      console.error('Error in RolesGuard:', err);
+      throw new UnauthorizedException('Access denied');
+    }
+  }
+
+  private decodeToken(token: string): string {
+    //TODO: Decode the token ( Firebase or JWT decode)
+
+    return 'decodedUserId';
   }
 }

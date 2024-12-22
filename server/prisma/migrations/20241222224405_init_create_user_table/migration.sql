@@ -3,7 +3,7 @@ CREATE TYPE "Role" AS ENUM ('USER', 'CREATOR', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "email" TEXT NOT NULL,
     "name" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -14,7 +14,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Creator" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
@@ -26,19 +26,19 @@ CREATE TABLE "Creator" (
 
 -- CreateTable
 CREATE TABLE "Membership" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "title" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "benefits" TEXT[],
-    "creatorId" INTEGER NOT NULL,
+    "creatorId" UUID NOT NULL,
 
     CONSTRAINT "Membership_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Subscription" (
-    "id" SERIAL NOT NULL,
-    "creatorId" INTEGER NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "creatorId" UUID NOT NULL,
     "tier" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

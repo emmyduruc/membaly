@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
@@ -16,7 +16,7 @@ model User {
 }
 
 model Creator {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email        String         @unique
   name         String
   description  String?
@@ -27,17 +27,17 @@ model Creator {
 }
 
 model Membership {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title     String
   price     Float
   benefits  String[]
-  creatorId Int
+  creatorId String   @db.Uuid
   creator   Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {
-  id        Int      @id @default(autoincrement())
-  creatorId Int
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creatorId String   @db.Uuid
   creator   Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   tier      String // Subscription tier (e.g., Basic, Premium)
   createdAt DateTime @default(now())
