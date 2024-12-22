@@ -1,4 +1,12 @@
-import { Body, Controller, Inject, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  Res,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -9,12 +17,13 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FirebaseAuthGuard } from './guards/firebase.guard';
 import { UserService } from 'apps/user/src/user.service';
 import { Prisma } from '@prisma/client';
-import { Role } from '@app/common/validators';
+import { createUserSchema, Role } from '@app/common/validators';
 import { FirebaseAdminService } from '../firebase';
 import {
   UserLoginDto,
   UserRegisterDto,
 } from '@app/common/decorator/user.decorator';
+import { JoiValidationPipe } from '@app/common/validators/joinValidationPipe';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -47,6 +56,7 @@ export class AuthController {
     description:
       'Registers a user with Firebase and saves them in the database.',
   })
+  @UsePipes(new JoiValidationPipe(createUserSchema))
   async register(@Body() data: UserRegisterDto) {
     try {
       return this.authService.register(data);
