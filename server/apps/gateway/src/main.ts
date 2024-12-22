@@ -3,7 +3,10 @@ import { GatewayModule } from './gateway.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(GatewayModule);
+  const app = await NestFactory.create(GatewayModule, {
+    cors: true,
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
 
   const config = new DocumentBuilder()
     .setTitle('API Gateway')

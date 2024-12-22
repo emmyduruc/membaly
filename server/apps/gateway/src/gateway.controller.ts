@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { pipe, timeout } from 'rxjs';
 
 @Controller('gateway')
 export class GatewayController {
@@ -25,17 +26,22 @@ export class GatewayController {
   }
 
   @Get('membership/list')
-  listMemberships() {
-    return this.membershipService.send({ cmd: 'list-memberships' }, {});
+  async listMemberships() {
+    try {
+      return await this.membershipService
+        .send({ cmd: 'list-memberships' }, {})
+        .pipe(timeout(5000))
+        .toPromise();
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
   }
 
   @Get('membership/hello')
   getHello() {
-    return this.membershipService.send(
-      { cmd: 'get-hello' },
-      {
-        message: 'Hello from the API Gateway!',
-      },
-    );
+    return this.membershipService
+      .send({ cmd: 'get-hello' }, {})
+      .pipe(timeout(5000))
+      .toPromise();
   }
 }
