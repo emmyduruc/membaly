@@ -6,6 +6,7 @@ import { CurrentUser } from './current-user.decorator';
 import JwtAuthGuard from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FirebaseAuthGuard } from './guards/firebase.guard';
 
 interface User {
   _id: {
@@ -19,6 +20,7 @@ export class AuthController {
   constructor(@Inject('AUTH') private readonly authService: ClientProxy) {}
 
   @Post('login')
+  @UseGuards(FirebaseAuthGuard)
   @ApiOperation({
     summary: 'User Login',
     description: 'Authenticates the user and returns a token.',

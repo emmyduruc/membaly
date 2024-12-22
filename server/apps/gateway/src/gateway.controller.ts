@@ -25,7 +25,7 @@ export class GatewayController {
         { name: 'Membership Service', route: '/membership' },
         { name: 'Analytics Service', route: '/analytics' },
       ],
-      documentation: '/api-docs',
+      documentation: '/api',
     };
   }
 

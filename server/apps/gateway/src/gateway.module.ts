@@ -10,6 +10,7 @@ import { PaymentController } from 'apps/payment/src/payment.controller';
 import { MembershipController } from 'apps/membership/src/membership.controller';
 import { PaymentModule } from 'apps/payment/src/payment.module';
 import { PaymentService } from 'apps/payment/src/payment.service';
+import { FirebaseAdminService } from 'apps/auth/firebase';
 
 @Module({
   imports: [
@@ -37,6 +38,6 @@ import { PaymentService } from 'apps/payment/src/payment.service';
     MembershipController,
     GatewayController,
   ],
-  providers: [GatewayService, PaymentService],
+  providers: [GatewayService, PaymentService, FirebaseAdminService],
 })
 export class GatewayModule {}
