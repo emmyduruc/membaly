@@ -1,49 +1,40 @@
 import { Controller, Get, Post, Body, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { pipe, timeout } from 'rxjs';
 
+@ApiTags('Gateway')
 @Controller('gateway')
 export class GatewayController {
   constructor(
-    @Inject('AUTH') private readonly authService: ClientProxy,
-    @Inject('PAYMENT') private readonly paymentService: ClientProxy,
     @Inject('MEMBERSHIP') private readonly membershipService: ClientProxy,
-    @Inject('USER') private readonly userService: ClientProxy,
-    @Inject('ANALYTICS') private readonly analyticsService: ClientProxy,
   ) {}
-
   @Get('/')
+  @ApiOperation({
+    summary: 'API Gateway Root',
+    description:
+      'Returns a welcome message and basic information about the API Gateway.',
+  })
   getRoot() {
-    return { message: 'Welcome to the API Gateway!' };
+    return {
+      message: 'Welcome to the API Gateway!',
+      services: [
+        { name: 'Auth Service', route: '/auth' },
+        { name: 'User Service', route: '/user' },
+        { name: 'Payment Service', route: '/payment' },
+        { name: 'Membership Service', route: '/membership' },
+        { name: 'Analytics Service', route: '/analytics' },
+      ],
+      documentation: '/api-docs',
+    };
   }
 
-  @Post('auth/login')
-  login(@Body() credentials: any) {
-    return this.authService.send({ cmd: 'login' }, credentials);
-  }
-
-  @Post('payment/process')
-  processPayment(@Body() paymentData: any) {
-    return this.paymentService.send({ cmd: 'process-payment' }, paymentData);
-  }
-
-  @Get('membership/list')
-  async listMemberships() {
-    try {
-      return await this.membershipService
-        .send({ cmd: 'list-memberships' }, {})
-        .pipe(timeout(5000))
-        .toPromise();
-    } catch (err) {
-      console.error(`Error: ${err}`);
-    }
-  }
-
-  @Get('membership/hello')
-  getHello() {
-    return this.membershipService
-      .send({ cmd: 'get-hello' }, {})
-      .pipe(timeout(5000))
-      .toPromise();
+  @Get('health')
+  @ApiOperation({
+    summary: 'Health Check',
+    description: 'Checks the health of the API Gateway.',
+  })
+  healthCheck() {
+    return { status: 'OK', timestamp: new Date().toISOString() };
   }
 }

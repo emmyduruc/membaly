@@ -1,13 +1,23 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { UserService } from './user.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { timeout } from 'rxjs';
 
-@Controller()
+@ApiTags('User')
+@Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(@Inject('USER') private readonly userService: ClientProxy) {}
 
-  @MessagePattern({ cmd: 'get-user' }) // This listens for the 'get-user' command
-  async getUser(data: any) {
-    return this.userService.getUser(data.userId); // Logic in the service layer
+  @Get('get')
+  @ApiOperation({
+    summary: 'Get User Data',
+    description: 'Retrieves user information.',
+  })
+  getUser() {
+    return this.userService
+      .send({ cmd: 'get-user' }, {})
+      .pipe(timeout(5000))
+      .toPromise();
   }
 }

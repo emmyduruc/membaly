@@ -3,26 +3,21 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { UserModule } from './user.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(UserModule);
-
-  app.enableCors();
-
-  app.useLogger(['error', 'warn', 'log', 'debug', 'verbose']);
-
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL],
-      queue: process.env.RABBITMQ_MEMBERSHIP_QUEUE,
-      queueOptions: {
-        durable: true,
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    UserModule,
+    {
+      transport: Transport.RMQ,
+      options: {
+        urls: [process.env.RABBITMQ_URL],
+        queue: process.env.RABBITMQ_MEMBERSHIP_QUEUE,
+        queueOptions: {
+          durable: true,
+        },
       },
     },
-  });
-
-  await app.startAllMicroservices();
-  await app.listen(process.env.PORT);
-  console.log(`User Microservice is running with HTTP support`);
+  );
+  await app.listen();
+  console.log(`User Microservice is running`);
 }
 
 bootstrap();

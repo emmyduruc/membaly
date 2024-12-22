@@ -15,7 +15,7 @@ import * as joi from 'joi';
       }),
       envFilePath: ['.env'],
     }),
-    RmqModule.register({ name: 'USER' }),
+    RmqModule.register({ name: 'ANALYTICS' }),
   ],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],

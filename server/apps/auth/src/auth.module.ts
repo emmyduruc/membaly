@@ -11,9 +11,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
-    // DatabaseModule,
-    // UsersModule,
-    RmqModule,
+    RmqModule.register({ name: 'AUTH' }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({

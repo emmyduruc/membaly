@@ -1,12 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
-import { AnalyticsService } from './analytics.service';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { timeout } from 'rxjs';
 
-@Controller()
+@ApiTags('Analytics')
+@Controller('analytics')
 export class AnalyticsController {
-  constructor(private readonly analyticsService: AnalyticsService) {}
+  constructor(
+    @Inject('ANALYTICS') private readonly analyticClientProxy: ClientProxy,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.analyticsService.getHello();
+  @Get('get')
+  @ApiOperation({
+    summary: 'Get Analytics',
+    description: 'Retrieves analytics data.',
+  })
+  getAnalytics() {
+    return this.analyticClientProxy
+      .send({ cmd: 'get-analytics' }, {})
+      .pipe(timeout(5000))
+      .toPromise();
   }
 }
