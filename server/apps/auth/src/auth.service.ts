@@ -10,7 +10,7 @@ import {
 } from '@app/common/decorator/user.decorator';
 import { UserService } from 'apps/user/src/user.service';
 
-const __DEV__ = process.env.NODE_ENV === 'development';
+const __DEV__ = process.env.NODE_ENV !== 'development';
 export interface TokenPayload {
   userId: string;
 }
@@ -33,11 +33,9 @@ export class AuthService {
         if (!existingUser) {
           throw new Error('User not found');
         }
-
         const token = await this.firebaseAdminService.createCustomToken(
           existingUser.id,
         );
-
         if (!token) {
           throw new Error('Failed to create custom token');
         }
