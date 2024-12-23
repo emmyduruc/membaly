@@ -1,11 +1,32 @@
 import { NestFactory } from '@nestjs/core';
 import { GatewayModule } from './gateway.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as admin from 'firebase-admin';
 
 async function bootstrap() {
+  if (!admin.apps.length) {
+    if (
+      !process.env.FIREBASE_PROJECT_ID ||
+      !process.env.FIREBASE_CLIENT_EMAIL
+    ) {
+      throw new Error('Firebase environment variables are missing or invalid');
+    }
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      }),
+    });
+  }
   const app = await NestFactory.create(GatewayModule, {
     cors: true,
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
+
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
 
   const config = new DocumentBuilder()

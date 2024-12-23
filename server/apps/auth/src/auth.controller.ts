@@ -26,7 +26,6 @@ import {
 import { JoiValidationPipe } from '@app/common/validators/joinValidationPipe';
 
 @ApiTags('Auth')
-@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(
