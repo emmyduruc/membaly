@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 import { RmqModule } from '@app/common';
 import * as Joi from 'joi';
 import { AuthController } from './auth.controller';
@@ -9,8 +8,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { FirebaseAdminService } from '../firebase';
 import { UserService } from 'apps/user/src/user.service';
-// import { UsersModule } from './users/users.module';
-
 @Module({
   imports: [
     RmqModule.register({ name: 'AUTH' }),
@@ -21,16 +18,7 @@ import { UserService } from 'apps/user/src/user.service';
         JWT_EXPIRATION: Joi.string().required(),
         MONGODB_URI: Joi.string().required(),
       }),
-      envFilePath: './apps/auth/.env',
-    }),
-    JwtModule.registerAsync({
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: `${configService.get('JWT_EXPIRATION')}s`,
-        },
-      }),
-      inject: [ConfigService],
+      envFilePath: ['.env'],
     }),
   ],
   controllers: [AuthController],

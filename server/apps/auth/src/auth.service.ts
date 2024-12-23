@@ -36,19 +36,26 @@ export class AuthService {
         const token = await this.firebaseAdminService.createCustomToken(
           existingUser.id,
         );
+
         if (!token) {
           throw new Error('Failed to create custom token');
         }
 
         const payload = { userId: existingUser.id, role: existingUser.role };
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, {
+          expiresIn: this.configService.get('JWT_EXPIRATION'),
+          secret: this.configService.get('JWT_SECRET'),
+        });
       } else {
         const decodedToken =
           await this.firebaseAdminService.verifyFirebaseToken(loginDto.token);
 
         const user = await this.userService.findUserById(decodedToken.uid);
         const payload = { userId: user.id, role: user.role };
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, {
+          expiresIn: Number(this.configService.get('JWT_EXPIRATION')),
+          secret: this.configService.get('JWT_SECRET'),
+        });
       }
     } catch (err) {
       console.error('Error during login:', err);

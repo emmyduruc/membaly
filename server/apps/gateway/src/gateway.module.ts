@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GatewayController } from './gateway.controller';
 import { GatewayService } from './gateway.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as joi from 'joi';
 import { AuthModule, RmqModule } from 'libs/common/src';
 import { AuthController } from 'apps/auth/src/auth.controller';
@@ -13,7 +13,7 @@ import { PaymentService } from 'apps/payment/src/payment.service';
 import { FirebaseAdminService } from 'apps/auth/firebase';
 import { UserService } from 'apps/user/src/user.service';
 import { AuthService } from 'apps/auth/src/auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -24,6 +24,17 @@ import { JwtService } from '@nestjs/jwt';
         RABBITMQ_GATEWAY_QUEUE: joi.string().required(),
       }),
       envFilePath: ['.env'],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        secretOrPrivateKey: configService.get('JWT_SECRET_OR_PRIVATE_KEY'),
+        signOptions: {
+          expiresIn: `${configService.get('JWT_EXPIRATION')}s`,
+        },
+      }),
+      inject: [ConfigService],
     }),
     RmqModule.register({ name: 'GATEWAY' }),
     RmqModule.register({ name: 'AUTH' }),
