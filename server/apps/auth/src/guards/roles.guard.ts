@@ -7,12 +7,14 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '@app/common/decorator/roles.decorator';
 import { UserService } from 'apps/user/src/user.service';
+import { FirebaseAdminService } from 'apps/auth/firebase';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly userService: UserService,
+    private readonly firebaseAdminService: FirebaseAdminService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -37,7 +39,7 @@ export class RolesGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
 
     try {
-      const userId = this.decodeToken(token);
+      const userId = await this.decodeToken(token);
 
       const user = await this.userService.findUserByFirebaseId(userId);
 
@@ -51,10 +53,19 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('Access denied');
     }
   }
+  private async decodeToken(token: string): Promise<string> {
+    try {
+      const decodedToken = await this.firebaseAdminService.verifyFirebaseToken(
+        token,
+      );
 
-  private decodeToken(token: string): string {
-    //TODO: Decode the token ( Firebase or JWT decode)
+      if (!decodedToken.uid) {
+        throw new Error('UID not found in decoded token');
+      }
 
-    return 'decodedUserId';
+      return decodedToken.uid;
+    } catch (error) {
+      throw new Error('Invalid or expired token');
+    }
   }
 }

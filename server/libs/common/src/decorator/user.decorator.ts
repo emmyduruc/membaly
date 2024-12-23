@@ -7,6 +7,17 @@ export class UserLoginDto {
     example: 'JohnDoe@gmail.com',
   })
   email: string;
+  @ApiProperty({
+    description: 'The unique identifier for the user.',
+    example: '1234567',
+  })
+  password: string;
+
+  @ApiProperty({
+    description: 'The unique identifier for the user role.',
+    example: 'token',
+  })
+  token: string;
 }
 
 export class UserRegisterDto {

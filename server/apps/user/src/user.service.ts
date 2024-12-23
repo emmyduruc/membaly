@@ -21,6 +21,30 @@ export class UserService {
     });
   }
 
+  async validateUser(email: string, password: string) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  findUserByEmail(email: string) {
+    return prisma.user.findUnique({
+      where: { email },
+    });
+  }
+
+  findUserById(userId: string) {
+    return prisma.user.findUnique({
+      where: { id: userId },
+    });
+  }
+
   async findUserByFirebaseId(firebaseId: string) {
     return prisma.user.findUnique({
       where: { id: firebaseId },

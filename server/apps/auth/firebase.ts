@@ -6,8 +6,8 @@ import { getAuth } from 'firebase-admin/auth';
 export class FirebaseAdminService {
   constructor() {}
 
-  async verifyToken(token: string): Promise<admin.auth.DecodedIdToken> {
-    return getAuth().verifyIdToken(token);
+  async verifyFirebaseToken(token: string): Promise<admin.auth.DecodedIdToken> {
+    return await getAuth().verifyIdToken(token);
   }
 
   async createUser({ email, password }): Promise<admin.auth.UserRecord> {
@@ -23,6 +23,17 @@ export class FirebaseAdminService {
 
   async getUserByEmail(email: string): Promise<admin.auth.UserRecord> {
     return getAuth().getUserByEmail(email);
+  }
+
+  async createUserWithPassword({ email, password }) {
+    return getAuth().createUser({
+      email,
+      password,
+    });
+  }
+
+  async getUser(uid: string): Promise<admin.auth.UserRecord> {
+    return getAuth().getUser(uid);
   }
 
   async deleteUser(uid: string) {

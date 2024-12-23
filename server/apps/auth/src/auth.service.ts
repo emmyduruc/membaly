@@ -10,6 +10,7 @@ import {
 } from '@app/common/decorator/user.decorator';
 import { UserService } from 'apps/user/src/user.service';
 
+const __DEV__ = process.env.NODE_ENV === 'development';
 export interface TokenPayload {
   userId: string;
 }
@@ -23,38 +24,34 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async login(
-    credentials: UserLoginDto,
-  ): Promise<{ message: string; token: string }> {
-    // const tokenPayload: TokenPayload = {
-    //   userId: user._id.toHexString(),
-    // };
-
-    // const expires = new Date();
-    // expires.setSeconds(
-    //   expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
-    // );
-
-    // const token = this.jwtService.sign(tokenPayload);
-
-    // response.cookie('Authentication', token, {
-    //   httpOnly: true,
-    //   expires,
-    // });
+  async login(loginDto: UserLoginDto): Promise<string> {
     try {
-      const userCred = await this.firebaseAdminService.getUserByEmail(
-        credentials.email,
-      );
+      if (__DEV__) {
+        const existingUser = await this.userService.findUserByEmail(
+          loginDto.email,
+        );
+        if (!existingUser) {
+          throw new Error('User not found');
+        }
 
-      // Verify email  password (done client-side)
-      const token = await this.firebaseAdminService.createCustomToken(
-        userCred.uid,
-      );
+        const token = await this.firebaseAdminService.createCustomToken(
+          existingUser.id,
+        );
 
-      return {
-        message: 'Login successful',
-        token,
-      };
+        if (!token) {
+          throw new Error('Failed to create custom token');
+        }
+
+        const payload = { userId: existingUser.id, role: existingUser.role };
+        return this.jwtService.sign(payload);
+      } else {
+        const decodedToken =
+          await this.firebaseAdminService.verifyFirebaseToken(loginDto.token);
+
+        const user = await this.userService.findUserById(decodedToken.uid);
+        const payload = { userId: user.id, role: user.role };
+        return this.jwtService.sign(payload);
+      }
     } catch (err) {
       console.error('Error during login:', err);
       throw err;
