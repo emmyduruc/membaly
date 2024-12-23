@@ -4,7 +4,7 @@ import { Role } from '@prisma/client';
 export class UserLoginDto {
   @ApiProperty({
     description: 'The unique identifier for the user.',
-    example: 'JohnDoe@gmail.com',
+    example: 'email@gmail.com',
   })
   email: string;
   @ApiProperty({
