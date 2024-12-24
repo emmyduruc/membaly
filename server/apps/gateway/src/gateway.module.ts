@@ -14,6 +14,8 @@ import { FirebaseAdminService } from 'apps/auth/firebase';
 import { UserService } from 'apps/user/src/user.service';
 import { AuthService } from 'apps/auth/src/auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { MembershipService } from 'apps/membership/src/membership.service';
+import { AnalyticsService } from 'apps/analytics/src/analytics.service';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     UserService,
     AuthService,
     JwtService,
+    MembershipService,
+    AnalyticsService,
   ],
 })
 export class GatewayModule {}

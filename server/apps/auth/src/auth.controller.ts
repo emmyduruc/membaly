@@ -1,23 +1,9 @@
-import {
-  Body,
-  Controller,
-  Inject,
-  Post,
-  Res,
-  UseGuards,
-  UsePipes,
-} from '@nestjs/common';
-import { ClientProxy, MessagePattern } from '@nestjs/microservices';
-import { Response } from 'express';
+import { Body, Controller, Inject, Post, UsePipes } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { CurrentUser } from '../../../libs/common/src/decorator/current-user.decorator';
-import JwtAuthGuard from './guards/jwt-auth.guard';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FirebaseAuthGuard } from './guards/firebase.guard';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from 'apps/user/src/user.service';
-import { Prisma } from '@prisma/client';
-import { createUserSchema, Role } from '@app/common/validators';
+import { createUserSchema } from '@app/common/validators';
 import { FirebaseAdminService } from '../firebase';
 import {
   UserLoginDto,

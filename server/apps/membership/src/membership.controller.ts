@@ -1,32 +1,83 @@
-// import { Controller } from '@nestjs/common';
-// import { MessagePattern } from '@nestjs/microservices';
-// import { MembershipService } from './membership.service';
-
-// @Controller()
-// export class MembershipController {
-//   constructor(private readonly membershipService: MembershipService) {}
-
-//   @MessagePattern({ cmd: 'list-memberships' }) // This listens for the 'list-memberships' command
-//   async listMemberships() {
-//     return this.membershipService.listMemberships(); // Logic in the service layer
-//   }
-
-//   @MessagePattern({ cmd: 'get-hello' })
-//   async getHello() {
-//     return this.membershipService.getHello();
-//   }
-// }
-import { Controller, Get, Inject } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Req,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { timeout } from 'rxjs';
+import { MembershipService } from './membership.service';
+import { CreateMembershipDto, MembershipIdDto } from './dto/membership.dto';
+import { JoiValidationPipe } from '@app/common/validators/joinValidationPipe';
+import { createUserSchema, Role } from '@app/common/validators';
+import { createMembershipSchema } from '@app/common/validators/membership.schema';
+import { RolesGuard } from 'apps/auth/src/guards/roles.guard';
+import { Roles } from '@app/common/decorator/roles.decorator';
 
 @ApiTags('Membership')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.CREATOR, Role.ADMIN)
 @Controller('membership')
 export class MembershipController {
   constructor(
-    @Inject('MEMBERSHIP') private readonly membershipService: ClientProxy,
+    @Inject('MEMBERSHIP') private readonly membershipClientProxy: ClientProxy,
+    private readonly membershipService: MembershipService,
   ) {}
+
+  @Get('create')
+  @UsePipes(new JoiValidationPipe(createMembershipSchema))
+  @ApiOperation({
+    summary: 'Create Membership',
+    description: 'Creates a new membership.',
+  })
+  async createMembership(@Body() createMembershipDto: CreateMembershipDto) {
+    return await this.membershipService.createMembership(createMembershipDto);
+  }
+
+  @Patch('update')
+  @UsePipes(new JoiValidationPipe(createMembershipSchema))
+  @ApiOperation({
+    summary: 'Update Membership',
+    description: 'Updates an existing membership.',
+  })
+  async updateMembership(@Body() createMembershipDto: CreateMembershipDto) {
+    return await this.membershipService.updateMembership(createMembershipDto);
+  }
+
+  @Delete('delete')
+  @ApiOperation({
+    summary: 'Delete Membership',
+    description: 'Deletes an existing membership.',
+  })
+  async deleteMembership(@Param('id') id: string) {
+    return await this.membershipService.deleteMembership({ id });
+  }
+
+  @Get('get')
+  @ApiOperation({
+    summary: 'Get Membership',
+    description: 'Gets an existing membership.',
+  })
+  async getMembership() {
+    return await this.membershipService.getAllMembership();
+  }
+
+  @Get('get-by-id/:id')
+  @ApiOperation({
+    summary: 'Get Membership by ID',
+    description: 'Gets an existing membership by ID.',
+  })
+  async getMembershipById(@Param('id') id: string) {
+    return await this.membershipService.getMembershipById(id);
+  }
 
   @Get('list')
   @ApiOperation({
@@ -35,7 +86,7 @@ export class MembershipController {
   })
   async listMemberships() {
     try {
-      return await this.membershipService
+      return await this.membershipClientProxy
         .send({ cmd: 'list-memberships' }, {})
         .pipe(timeout(5000))
         .toPromise();
@@ -50,9 +101,11 @@ export class MembershipController {
     description: 'Returns a hello message from the membership service.',
   })
   getHello() {
-    return this.membershipService
+    return this.membershipClientProxy
       .send({ cmd: 'get-hello' }, {})
       .pipe(timeout(5000))
       .toPromise();
   }
 }
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJnVXdTTDFscUhzZjBtRWpZeGxSNnBrZTFPbHMxIiwicm9sZSI6IkNSRUFUT1IiLCJpYXQiOjE3MzQ5OTgxMzYsImV4cCI6MTczNDk5ODEzOX0.PRomcB47o2yZwiO8KZ4NCLHKfsyNrhvTk7obG9kxzUU
