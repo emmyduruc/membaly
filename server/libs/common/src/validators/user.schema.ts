@@ -3,9 +3,9 @@ import { Role as PrismaRole } from '@prisma/client';
 
 //create a schema for the user role
 export enum Role {
-  'ADMIN',
-  'USER',
-  'CREATOR',
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+  CREATOR = 'CREATOR',
 }
 export const mapUserRole = (role: PrismaRole): Role => {
   const roleMap: Record<PrismaRole, Role> = {
@@ -27,7 +27,7 @@ export const userSchema = Joi.object({
 export const createUserSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  role: Joi.string().valid('ADMIN', 'USER').required(),
+  role: Joi.string().valid('ADMIN', 'USER', 'CREATOR').required(),
 });
 export const updateUserSchema = Joi.object({
   email: Joi.string().email(),

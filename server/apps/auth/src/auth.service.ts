@@ -9,11 +9,9 @@ import {
   UserRegisterDto,
 } from '@app/common/decorator/user.decorator';
 import { UserService } from 'apps/user/src/user.service';
+import { BadRequestException } from '@nestjs/common';
 
 const __DEV__ = process.env.NODE_ENV !== 'development';
-export interface TokenPayload {
-  userId: string;
-}
 
 @Injectable()
 export class AuthService {
@@ -24,38 +22,36 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async login(loginDto: UserLoginDto): Promise<string> {
+  async login(loginDto: UserLoginDto): Promise<{
+    token: string;
+    user: User;
+  }> {
     try {
       if (__DEV__) {
+        if (!loginDto.email) {
+          throw new BadRequestException('Email is required');
+        }
         const existingUser = await this.userService.findUserByEmail(
           loginDto.email,
         );
         if (!existingUser) {
           throw new Error('User not found');
         }
-        const token = await this.firebaseAdminService.createCustomToken(
-          existingUser.id,
-        );
+        const token = this.jwtSign(existingUser);
 
-        if (!token) {
-          throw new Error('Failed to create custom token');
-        }
-
-        const payload = { userId: existingUser.id, role: existingUser.role };
-        return this.jwtService.sign(payload, {
-          expiresIn: this.configService.get('JWT_EXPIRATION'),
-          secret: this.configService.get('JWT_SECRET'),
-        });
+        return {
+          token: token,
+          user: existingUser,
+        };
       } else {
         const decodedToken =
           await this.firebaseAdminService.verifyFirebaseToken(loginDto.token);
 
         const user = await this.userService.findUserById(decodedToken.uid);
-        const payload = { userId: user.id, role: user.role };
-        return this.jwtService.sign(payload, {
-          expiresIn: Number(this.configService.get('JWT_EXPIRATION')),
-          secret: this.configService.get('JWT_SECRET'),
-        });
+        return {
+          token: this.jwtSign(user),
+          user: user,
+        };
       }
     } catch (err) {
       console.error('Error during login:', err);
@@ -63,9 +59,22 @@ export class AuthService {
     }
   }
 
+  jwtSign(payload: User): string {
+    return this.jwtService.sign(payload, {
+      expiresIn: this.configService.get('JWT_EXPIRATION'),
+      secret: this.configService.get('JWT_SECRET'),
+    });
+  }
+
+  jwtVerify(token: string): User {
+    return this.jwtService.verify(token, {
+      secret: this.configService.get('JWT_SECRET'),
+    });
+  }
+
   async register(
     data: UserRegisterDto,
-  ): Promise<{ user: User; message: string }> {
+  ): Promise<{ user: User; token: string }> {
     try {
       const firebaseUser = await this.firebaseAdminService.createUser({
         email: data.email,
@@ -82,8 +91,14 @@ export class AuthService {
         role: data.role,
       });
 
+      if (!prismaUser) {
+        throw new Error('Failed to create user in Prisma');
+      }
+
+      const token = this.jwtSign(prismaUser);
+
       return {
-        message: 'User registered successfully',
+        token: token,
         user: prismaUser,
       };
     } catch (err) {

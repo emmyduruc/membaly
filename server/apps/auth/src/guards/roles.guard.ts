@@ -8,6 +8,9 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '@app/common/decorator/roles.decorator';
 import { UserService } from 'apps/user/src/user.service';
 import { FirebaseAdminService } from 'apps/auth/firebase';
+import { ConfigService } from '@nestjs/config';
+import { AuthService } from '../auth.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -15,6 +18,8 @@ export class RolesGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly userService: UserService,
     private readonly firebaseAdminService: FirebaseAdminService,
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -37,11 +42,10 @@ export class RolesGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
-
     try {
-      const userId = await this.decodeToken(token);
+      const authUser = this.decodeToken(token);
 
-      const user = await this.userService.findUserByFirebaseId(userId);
+      const user = await this.userService.findUserByRole(authUser.id);
 
       if (!user || !user.role) {
         throw new UnauthorizedException('User role not found');
@@ -53,19 +57,13 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('Access denied');
     }
   }
-  private async decodeToken(token: string): Promise<string> {
+
+  private decodeToken(token: string): User {
     try {
-      const decodedToken = await this.firebaseAdminService.verifyFirebaseToken(
-        token,
-      );
-
-      if (!decodedToken.uid) {
-        throw new Error('UID not found in decoded token');
-      }
-
-      return decodedToken.uid;
-    } catch (error) {
-      throw new Error('Invalid or expired token');
+      return this.authService.jwtVerify(token);
+    } catch (err) {
+      console.error('Error decoding token:', err);
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

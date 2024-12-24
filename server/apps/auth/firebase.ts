@@ -32,6 +32,10 @@ export class FirebaseAdminService {
     });
   }
 
+  async loginWithPassword({ email, password }) {
+    return getAuth().getUserByEmail(email);
+  }
+
   async getUser(uid: string): Promise<admin.auth.UserRecord> {
     return getAuth().getUser(uid);
   }

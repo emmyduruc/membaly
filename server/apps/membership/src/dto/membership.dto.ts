@@ -3,6 +3,9 @@ import { IsArray, IsNumber, IsUUID } from 'class-validator';
 
 export class CreateMembershipDto {
   @IsString()
+  id: string;
+
+  @IsString()
   title: string;
 
   @IsString()
@@ -27,6 +30,11 @@ export class CreateMembershipDto {
 
   @IsUUID()
   creatorId: string;
+}
+
+export class MembershipIdDto {
+  @IsUUID()
+  id: string;
 }
 
 export class UpdateMembershipDto {

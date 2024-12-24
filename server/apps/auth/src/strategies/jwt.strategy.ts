@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate({ userId }: TokenPayload) {
     try {
-      const user = this.usersService.findUserByFirebaseId(userId);
+      const user = this.usersService.findUserByRole(userId);
       if (!user) {
         throw new UnauthorizedException();
       }

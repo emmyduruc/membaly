@@ -6,7 +6,7 @@ import {
   Inject,
   Param,
   Patch,
-  Req,
+  Post,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -14,9 +14,9 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { timeout } from 'rxjs';
 import { MembershipService } from './membership.service';
-import { CreateMembershipDto, MembershipIdDto } from './dto/membership.dto';
+import { CreateMembershipDto } from './dto/membership.dto';
 import { JoiValidationPipe } from '@app/common/validators/joinValidationPipe';
-import { createUserSchema, Role } from '@app/common/validators';
+import { Role } from '@app/common/validators';
 import { createMembershipSchema } from '@app/common/validators/membership.schema';
 import { RolesGuard } from 'apps/auth/src/guards/roles.guard';
 import { Roles } from '@app/common/decorator/roles.decorator';
@@ -32,7 +32,7 @@ export class MembershipController {
     private readonly membershipService: MembershipService,
   ) {}
 
-  @Get('create')
+  @Post('create')
   @UsePipes(new JoiValidationPipe(createMembershipSchema))
   @ApiOperation({
     summary: 'Create Membership',
@@ -107,5 +107,3 @@ export class MembershipController {
       .toPromise();
   }
 }
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJnVXdTTDFscUhzZjBtRWpZeGxSNnBrZTFPbHMxIiwicm9sZSI6IkNSRUFUT1IiLCJpYXQiOjE3MzQ5OTgxMzYsImV4cCI6MTczNDk5ODEzOX0.PRomcB47o2yZwiO8KZ4NCLHKfsyNrhvTk7obG9kxzUU

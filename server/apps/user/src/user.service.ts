@@ -45,7 +45,7 @@ export class UserService {
     });
   }
 
-  async findUserByFirebaseId(firebaseId: string) {
+  async findUserByRole(firebaseId: string) {
     return prisma.user.findUnique({
       where: { id: firebaseId },
       select: { role: true },
