@@ -164,6 +164,58 @@ export class MembershipService {
     return { category, tag, categoryTag };
   }
 
+  async getMembershipCategories() {
+    try {
+      return await prisma.category.findMany({
+        include: {
+          tags: true,
+        },
+      });
+    } catch (err) {
+      throw new Error(`Error getting categories: ${err}`);
+    }
+  }
+
+  async getMembershipTags() {
+    try {
+      return await prisma.tag.findMany();
+    } catch (err) {
+      throw new Error(`Error getting tags: ${err}`);
+    }
+  }
+
+  async getMembershipTagById(id: string) {
+    try {
+      const tag = await prisma.tag.findUnique({
+        where: { id: id },
+      });
+
+      if (!tag) {
+        throw new NotFoundException(`Tag with id ${id} not found`);
+      }
+
+      return tag;
+    } catch (err) {
+      throw new Error(`Error getting tag: ${err}`);
+    }
+  }
+
+  async getMembershipCategoryById(id: string) {
+    try {
+      const category = await prisma.category.findUnique({
+        where: { id: id },
+      });
+
+      if (!category) {
+        throw new NotFoundException(`Category with id ${id} not found`);
+      }
+
+      return category;
+    } catch (err) {
+      throw new Error(`Error getting category: ${err}`);
+    }
+  }
+
   async getAllMembership() {
     try {
       return await prisma.membership.findMany();

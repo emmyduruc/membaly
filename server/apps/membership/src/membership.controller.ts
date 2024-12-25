@@ -75,10 +75,47 @@ export class MembershipController {
   ) {
     return this.membershipService.createMembershipCategory(createCategoryDto);
   }
+
+  @Get('get-categories')
+  @ApiOperation({
+    summary: 'Get Categories',
+    description: 'Gets all categories.',
+  })
+  async getCategories(): Promise<Category[]> {
+    return await this.membershipService.getMembershipCategories();
+  }
+
   @Post('add-tag-to-category')
   async addTagToCategory(@Body() addTagToCategoryDto: AddTagToCategoryDto) {
     const { categoryName, tagName } = addTagToCategoryDto;
     return this.membershipService.addTagToCategory(categoryName, tagName);
+  }
+
+  @Get('get-tags')
+  @ApiOperation({
+    summary: 'Get Tags',
+    description: 'Gets all tags.',
+  })
+  async getTags() {
+    return await this.membershipService.getMembershipTags();
+  }
+
+  @Get('get-tag/:id')
+  @ApiOperation({
+    summary: 'Get Tag by ID',
+    description: 'Gets a tag by ID.',
+  })
+  async getTagById(@Param('id') id: string) {
+    return await this.membershipService.getMembershipTagById(id);
+  }
+
+  @Get('get-category/:id')
+  @ApiOperation({
+    summary: 'Get Category by ID',
+    description: 'Gets a category by ID.',
+  })
+  async getCategoryById(@Param('id') id: string) {
+    return await this.membershipService.getMembershipCategoryById(id);
   }
 
   @Patch('update')
