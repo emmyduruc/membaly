@@ -16,6 +16,7 @@ model User {
   verified        Boolean          @default(false)
   visibleInSearch Boolean          @default(true)
   stripeCustomerId String?
+  stripeAccountId String?
   memberships     Membership[]
   ratings         Rating[]
   favorites       Favorite[]

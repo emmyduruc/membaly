@@ -22,7 +22,37 @@ export class PaymentProviderService {
     });
     this.logger.log('StripeService initialized with API version 2023-10-16');
   }
+  //This method is used to connect a Stripe account to a creator's profile, so that we can charge users for their subscriptions and they can receive payments.
+  async connectStripeAccount(
+    creatorId: string,
+  ): Promise<{ onboardingLink: string }> {
+    const creator = await prisma.user.findUnique({ where: { id: creatorId } });
+    if (!creator) throw new BadRequestException('Creator not found');
 
+    let stripeAccountId = creator.stripeAccountId;
+
+    if (!stripeAccountId) {
+      const account = await this.stripe.accounts.create({
+        type: 'express',
+      });
+
+      stripeAccountId = account.id;
+
+      await prisma.user.update({
+        where: { id: creatorId },
+        data: { stripeAccountId },
+      });
+    }
+
+    const onboardingLink = await this.stripe.accountLinks.create({
+      account: stripeAccountId,
+      refresh_url: process.env.STRIPE_REDIRECT_URI,
+      return_url: process.env.STRIPE_RETURN_URI,
+      type: 'account_onboarding',
+    });
+
+    return { onboardingLink: onboardingLink.url };
+  }
   async createSubscription(
     userId: string,
     membershipId: string,
