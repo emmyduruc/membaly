@@ -16,6 +16,7 @@ import { AuthService } from 'apps/auth/src/auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { MembershipService } from 'apps/membership/src/membership.service';
 import { AnalyticsService } from 'apps/analytics/src/analytics.service';
+import { PaymentProviderService } from 'apps/payment/src/payment-provider/payment-provider.service';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { AnalyticsService } from 'apps/analytics/src/analytics.service';
     JwtService,
     MembershipService,
     AnalyticsService,
+    PaymentProviderService,
   ],
 })
 export class GatewayModule {}

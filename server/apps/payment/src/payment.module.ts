@@ -3,6 +3,7 @@ import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import { ConfigModule } from '@nestjs/config';
 import { RmqModule } from 'libs/common/src';
+import { PaymentProviderService } from './payment-provider/payment-provider.service';
 import * as joi from 'joi';
 
 @Module({
@@ -18,6 +19,6 @@ import * as joi from 'joi';
     RmqModule.register({ name: 'PAYMENT' }),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService],
+  providers: [PaymentService, PaymentProviderService],
 })
 export class PaymentModule {}

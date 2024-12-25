@@ -43,8 +43,8 @@ export class PaymentService {
         subscriptionType,
         userId,
         amount,
-        status: SubscriptionStatus.ACTIVE,
-      },
+        status: SubscriptionStatus.active,
+      } as Prisma.SubscriptionUncheckedCreateInput,
     });
 
     return subscription;
@@ -69,7 +69,7 @@ export class PaymentService {
   async cancelSubscription(subscriptionId: string) {
     const updatedSubscription = await prisma.subscription.update({
       where: { id: subscriptionId },
-      data: { status: SubscriptionStatus.CANCELLED },
+      data: { status: SubscriptionStatus.canceled },
     });
 
     return updatedSubscription;

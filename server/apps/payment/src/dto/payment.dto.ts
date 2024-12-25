@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SubscriptionStatus } from '@prisma/client';
 import { IsString, IsUUID, IsNumber, IsEnum } from 'class-validator';
 
 export enum PaymentType {
@@ -11,16 +12,6 @@ export enum SubscriptionType {
   MONTHLY = 'MONTHLY',
   YEARLY = 'YEARLY',
   QUARTERLY = 'QUARTERLY',
-}
-
-export enum SubscriptionStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  UNPAID = 'UNPAID',
-  CANCELLED = 'CANCELLED',
-  TRIAL = 'TRIAL',
-  PAST_DUE = 'PAST_DUE',
-  PAUSED = 'PAUSED',
 }
 
 export class CreatePaymentDto {

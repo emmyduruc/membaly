@@ -15,6 +15,7 @@ model User {
   role            Role             @default(USER)
   verified        Boolean          @default(false)
   visibleInSearch Boolean          @default(true)
+  stripeCustomerId String?
   memberships     Membership[]
   ratings         Rating[]
   favorites       Favorite[]
@@ -34,6 +35,7 @@ model Membership {
   benefits        String[]
   pictures        String[]
   creatorId       String
+  stripePriceId   String?
   creator         User             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   ratings         Rating[]
   categoryTags    CategoryTags[]   @relation("MembershipCategoryTags")
@@ -50,9 +52,10 @@ model Subscription {
   user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   membershipId String
   subscriptionType RecurringType  @default(MONTHLY)
+  stripeSubscriptionId String
   amount       Float
   membership   Membership         @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-  status       SubscriptionStatus @default(INACTIVE)
+  status       SubscriptionStatus @default(inactive)
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   expiresAt    DateTime?
@@ -162,11 +165,13 @@ enum PaymentStatus {
 }
 
 enum SubscriptionStatus {
-  ACTIVE
-  INACTIVE
-  UNPAID
-  CANCELLED
-  TRIAL
-  PAST_DUE
-  PAUSED
+  incomplete
+  incomplete_expired
+  trialing
+  active
+  inactive
+  past_due
+  canceled
+  unpaid
+  paused
 }
