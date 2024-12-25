@@ -178,7 +178,11 @@ export class MembershipService {
 
   async getMembershipTags() {
     try {
-      return await prisma.tag.findMany();
+      return await prisma.tag.findMany({
+        include: {
+          categories: true,
+        },
+      });
     } catch (err) {
       throw new Error(`Error getting tags: ${err}`);
     }
@@ -218,7 +222,16 @@ export class MembershipService {
 
   async getAllMembership() {
     try {
-      return await prisma.membership.findMany();
+      return await prisma.membership.findMany({
+        include: {
+          categoryTags: {
+            include: {
+              category: true,
+              tag: true,
+            },
+          },
+        },
+      });
     } catch (err) {
       throw new Error(`Error getting membership: ${err}`);
     }
