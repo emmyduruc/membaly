@@ -7,6 +7,7 @@ import {
   UsePipes,
   Delete,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -24,9 +25,14 @@ import {
   createSubscriptionSchema,
   updateSubscriptionSchema,
 } from '@app/common/validators/subscription.schema';
+import { Roles } from '@app/common/decorator/roles.decorator';
+import { Role } from '@app/common/validators';
+import { RolesGuard } from 'apps/auth/src/guards/roles.guard';
 
 @ApiTags('Payment')
 @ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.USER)
 @Controller('payment')
 export class PaymentController {
   constructor(

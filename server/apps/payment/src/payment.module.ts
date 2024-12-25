@@ -5,6 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 import { RmqModule } from 'libs/common/src';
 import { PaymentProviderService } from './payment-provider/payment-provider.service';
 import * as joi from 'joi';
+import { UserService } from 'apps/user/src/user.service';
+import { FirebaseAdminService } from 'apps/auth/firebase';
+import { AuthService } from 'apps/auth/src/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -19,6 +23,13 @@ import * as joi from 'joi';
     RmqModule.register({ name: 'PAYMENT' }),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, PaymentProviderService],
+  providers: [
+    PaymentService,
+    PaymentProviderService,
+    UserService,
+    FirebaseAdminService,
+    AuthService,
+    JwtService,
+  ],
 })
 export class PaymentModule {}
