@@ -11,15 +11,26 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { timeout } from 'rxjs';
 import { MembershipService } from './membership.service';
-import { CreateMembershipDto } from './dto/membership.dto';
+import {
+  AddTagToCategoryDto,
+  CreateMembershipCategoryDto,
+  CreateMembershipDto,
+  CreateMembershipTagDto,
+} from './dto/membership.dto';
 import { JoiValidationPipe } from '@app/common/validators/joinValidationPipe';
 import { Role } from '@app/common/validators';
 import { createMembershipSchema } from '@app/common/validators/membership.schema';
 import { RolesGuard } from 'apps/auth/src/guards/roles.guard';
 import { Roles } from '@app/common/decorator/roles.decorator';
+import { Category } from '@prisma/client';
 
 @ApiTags('Membership')
 @ApiBearerAuth()
@@ -40,6 +51,34 @@ export class MembershipController {
   })
   async createMembership(@Body() createMembershipDto: CreateMembershipDto) {
     return await this.membershipService.createMembership(createMembershipDto);
+  }
+
+  @Post('create/tag')
+  @ApiOperation({ summary: 'Create a new tag' })
+  @ApiResponse({
+    status: 201,
+    description: 'The tag has been successfully created.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  async createMembershipTag(@Body() createTagDto: CreateMembershipTagDto) {
+    return this.membershipService.createMembershipTag(createTagDto);
+  }
+  @Post('create/category')
+  @ApiOperation({ summary: 'Create a new category' })
+  @ApiResponse({
+    status: 201,
+    description: 'The category has been successfully created.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  async createMembershipCategory(
+    @Body() createCategoryDto: CreateMembershipCategoryDto,
+  ) {
+    return this.membershipService.createMembershipCategory(createCategoryDto);
+  }
+  @Post('add-tag-to-category')
+  async addTagToCategory(@Body() addTagToCategoryDto: AddTagToCategoryDto) {
+    const { categoryName, tagName } = addTagToCategoryDto;
+    return this.membershipService.addTagToCategory(categoryName, tagName);
   }
 
   @Patch('update')

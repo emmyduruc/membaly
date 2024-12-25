@@ -29,13 +29,11 @@ model Membership {
   description     String
   price           Float
   benefits        String[]
-  tags            String[]
   pictures        String[]
   creatorId       String
   creator         User             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   ratings         Rating[]
-  categoryId      String?
-  category        Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryTags    CategoryTags[]   @relation("MembershipCategoryTags")
   recommendations Recommendation[]
   favorites       Favorite[]
   successStories  SuccessStory[]
@@ -51,10 +49,27 @@ model Subscription {
 }
 
 model Category {
-  id          String       @id @default(uuid())
-  name        String       @unique
+  id          String         @id @default(uuid())
+  name        String         @unique
   description String?
-  memberships Membership[]
+  tags        CategoryTags[] @relation("CategoryTagsCategory")
+}
+
+model Tag {
+  id         String         @id @default(uuid())
+  name       String         @unique
+  categories CategoryTags[] @relation("CategoryTagsTag")
+}
+
+model CategoryTags {
+  id          String       @id @default(uuid())
+  categoryId  String
+  tagId       String
+  category    Category     @relation("CategoryTagsCategory", fields: [categoryId], references: [id], onDelete: Cascade)
+  tag         Tag          @relation("CategoryTagsTag", fields: [tagId], references: [id], onDelete: Cascade)
+  memberships Membership[] @relation("MembershipCategoryTags")
+
+  @@unique([categoryId, tagId]) // Ensures a unique combination of category and tag
 }
 
 model Rating {

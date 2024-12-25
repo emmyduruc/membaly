@@ -1,6 +1,16 @@
-import { Injectable } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { CreateMembershipDto, MembershipIdDto } from './dto/membership.dto';
+import {
+  CreateMembershipCategoryDto,
+  CreateMembershipDto,
+  CreateMembershipTagDto,
+  MembershipIdDto,
+} from './dto/membership.dto';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { prisma } from '@app/common';
 
 @Injectable()
@@ -11,9 +21,34 @@ export class MembershipService {
 
   async createMembership(dto: CreateMembershipDto) {
     try {
-      return await prisma.membership.create({
-        data: dto,
+      const { categoryTags, ...membershipData } = dto;
+
+      const membership = await prisma.membership.create({
+        data: {
+          ...membershipData,
+          creatorId: dto.creatorId,
+        },
       });
+
+      if (categoryTags && categoryTags.length > 0) {
+        const categoryTagsPromises = categoryTags.map((tag) => {
+          return prisma.categoryTags.create({
+            data: {
+              categoryId: tag.categoryId,
+              tagId: tag.tagId,
+              memberships: {
+                connect: {
+                  id: membership.id,
+                },
+              },
+            },
+          });
+        });
+
+        await Promise.all(categoryTagsPromises);
+      }
+
+      return membership;
     } catch (err) {
       throw new Error(`Error creating membership: ${err}`);
     }
@@ -21,9 +56,10 @@ export class MembershipService {
 
   async updateMembership(dto: CreateMembershipDto) {
     try {
+      const { categoryTags, id, creatorId, ...updateData } = dto;
       return await prisma.membership.update({
         where: { id: dto.id },
-        data: dto,
+        data: updateData,
       });
     } catch (err) {
       throw new Error(`Error updating membership: ${err}`);
@@ -38,6 +74,94 @@ export class MembershipService {
     } catch (err) {
       throw new Error(`Error deleting membership: ${err}`);
     }
+  }
+
+  async createMembershipTag(createTagDto: CreateMembershipTagDto) {
+    const { name } = createTagDto;
+
+    const tag = await prisma.tag.create({
+      data: {
+        name: name,
+      },
+    });
+
+    return tag;
+  }
+
+  async createMembershipCategory(
+    createCategoryDto: CreateMembershipCategoryDto,
+  ) {
+    try {
+      const { name, description } = createCategoryDto;
+
+      const category = await prisma.category.create({
+        data: {
+          name: name,
+          description: description,
+        },
+      });
+
+      return category;
+    } catch (err) {
+      throw new Error(`Error creating category: ${err}`);
+    }
+  }
+
+  async createCategory(categoryName: string, description?: string) {
+    try {
+      const existingCategory = await prisma.category.findUnique({
+        where: { name: categoryName },
+      });
+
+      if (existingCategory) {
+        return existingCategory;
+      }
+
+      const newCategory = await prisma.category.create({
+        data: {
+          name: categoryName,
+          description: description || '',
+        },
+      });
+
+      return newCategory;
+    } catch (err) {
+      throw new Error(`Error creating category: ${err}`);
+    }
+  }
+
+  async createTag(tagName: string) {
+    try {
+      const existingTag = await prisma.tag.findUnique({
+        where: { name: tagName },
+      });
+
+      if (existingTag) {
+        return existingTag;
+      }
+
+      const newTag = await prisma.tag.create({
+        data: { name: tagName },
+      });
+
+      return newTag;
+    } catch (err) {
+      throw new Error(`Error creating tag: ${err}`);
+    }
+  }
+
+  async addTagToCategory(categoryName: string, tagName: string) {
+    const category = await this.createCategory(categoryName);
+    const tag = await this.createTag(tagName);
+
+    const categoryTag = await prisma.categoryTags.create({
+      data: {
+        categoryId: category.id,
+        tagId: tag.id,
+      },
+    });
+
+    return { category, tag, categoryTag };
   }
 
   async getAllMembership() {
