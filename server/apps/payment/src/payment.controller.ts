@@ -1,17 +1,69 @@
-import { Controller, Post, Body, Inject, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Inject,
+  Get,
+  UsePipes,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentDto } from './payment.dto';
 import { catchError, throwError, timeout } from 'rxjs';
 import { PaymentService } from './payment.service';
+import { JoiValidationPipe } from '@app/common/validators/joinValidationPipe';
+import { createPaymentSchema } from '@app/common/validators/payment.schema';
+import {
+  CreatePaymentDto,
+  CreateSubscriptionDto,
+  UpdateSubscriptionDto,
+} from './dto/payment.dto';
+import {
+  createSubscriptionSchema,
+  updateSubscriptionSchema,
+} from '@app/common/validators/subscription.schema';
 
 @ApiTags('Payment')
+@ApiBearerAuth()
 @Controller('payment')
 export class PaymentController {
   constructor(
     @Inject('PAYMENT') private readonly paymentClientProxy: ClientProxy,
     private readonly paymentService: PaymentService,
   ) {}
+
+  @Post('create')
+  @ApiOperation({ summary: 'Create Payment' })
+  @UsePipes(new JoiValidationPipe(createPaymentSchema))
+  async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
+    return this.paymentService.createPayment(createPaymentDto);
+  }
+
+  @Post('subscribe')
+  @ApiOperation({ summary: 'Create Subscription' })
+  @UsePipes(new JoiValidationPipe(createSubscriptionSchema))
+  async createSubscription(
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
+  ) {
+    return this.paymentService.createSubscription(createSubscriptionDto);
+  }
+
+  @Patch('update-subscription')
+  @ApiOperation({ summary: 'Update Subscription' })
+  @UsePipes(new JoiValidationPipe(updateSubscriptionSchema))
+  async updateSubscription(
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
+    return this.paymentService.updateSubscription(updateSubscriptionDto);
+  }
+
+  @Delete('cancel-subscription/:subscriptionId')
+  @ApiOperation({ summary: 'Cancel Subscription' })
+  async cancelSubscription(@Body('subscriptionId') subscriptionId: string) {
+    return this.paymentService.cancelSubscription(subscriptionId);
+  }
 
   @Post('process')
   @ApiOperation({

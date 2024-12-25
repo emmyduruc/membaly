@@ -19,8 +19,9 @@ model User {
   ratings         Rating[]
   favorites       Favorite[]
   successStories  SuccessStory[]
-  Subscription    Subscription[]
-  Recommendation  Recommendation[]
+  subscriptions   Subscription[]
+  recommendations Recommendation[]
+  payments        Payment[]
 }
 
 model Membership {
@@ -28,6 +29,8 @@ model Membership {
   title           String
   description     String
   price           Float
+  paymentType     PaymentType      @default(FREE) // One-time, recurring, or free
+  recurringType   RecurringType?   // Monthly, yearly, quarterly (if paymentType = recurring)
   benefits        String[]
   pictures        String[]
   creatorId       String
@@ -37,15 +40,35 @@ model Membership {
   recommendations Recommendation[]
   favorites       Favorite[]
   successStories  SuccessStory[]
+  subscriptions   Subscription[]
+  payments        Payment[]
 }
 
 model Subscription {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tier      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String             @id @default(uuid())
+  userId       String
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membershipId String
+  subscriptionType RecurringType  @default(MONTHLY)
+  amount       Float
+  membership   Membership         @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  status       SubscriptionStatus @default(INACTIVE)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  expiresAt    DateTime?
+}
+
+model Payment {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membershipId String
+  paymentType  PaymentType   @default(FREE)    
+  membership   Membership    @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  amount       Float
+  currency     String        @default("USD")
+  status       PaymentStatus
+  paymentDate  DateTime      @default(now())
 }
 
 model Category {
@@ -69,7 +92,7 @@ model CategoryTags {
   tag         Tag          @relation("CategoryTagsTag", fields: [tagId], references: [id], onDelete: Cascade)
   memberships Membership[] @relation("MembershipCategoryTags")
 
-  @@unique([categoryId, tagId]) // Ensures a unique combination of category and tag
+  @@unique([categoryId, tagId])
 }
 
 model Rating {
@@ -117,4 +140,33 @@ enum Role {
   USER
   CREATOR
   ADMIN
+}
+
+enum PaymentType {
+  ONE_TIME
+  RECURRING
+  FREE
+}
+
+enum RecurringType {
+  MONTHLY
+  YEARLY
+  QUARTERLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  UNPAID
+  CANCELLED
+  TRIAL
+  PAST_DUE
+  PAUSED
 }
